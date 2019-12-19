@@ -1,12 +1,13 @@
 module Scouting exposing (Model, Msg, init, main, update, view)
 
-import Auto
+--import Auto
+
 import Browser
-import Element exposing (column, el, fill, layout, rgba, spacing, text, width)
+import Element exposing (centerX, centerY, column, el, layout, padding, rgb255, rgba, spacing, text, width)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
-import Element.Input exposing (button, labelBelow, placeholder, username)
+import Element.Input exposing (button)
 import InputHelper exposing (inputs, unwrapToString)
 import Matches exposing (asComment, stationName)
 
@@ -15,7 +16,7 @@ main : Program () Model Msg
 main =
     Browser.sandbox
         { init = init
-        , view = layout [] << view
+        , view = layout [ Background.color (rgb255 200 200 250) ] << view
         , update = update
         }
 
@@ -47,7 +48,7 @@ init =
     { scouter = ""
     , team = Nothing
     , match = Nothing
-    , driverStation = "    " -- for inputHelpMessage
+    , driverStation = "Please enter after typing the info ^^"
     , isStarted = Untouched
     }
 
@@ -91,8 +92,7 @@ ifCorrectInput model =
     if List.any ((==) "" << (|>) modelStr) [ .scouter, .team, .match ] then
         TriedPush
 
-    else if isStation " " || isStation "  " then
-        -- " " Not a match , "  " Team not in this match
+    else if isStation "Not a match" || isStation "Team not in this match" then
         TriedPush
 
     else
@@ -108,25 +108,6 @@ switchButtonState model =
         ifCorrectInput model
 
 
-inputHelpMessage : String -> String
-inputHelpMessage strStation =
-    case strStation of
-        "    " ->
-            "Please fill all inputs^^"
-
-        "  " ->
-            "Team not in this match"
-
-        " " ->
-            "Not a match"
-
-        "" ->
-            "All inputs are required."
-
-        _ ->
-            ""
-
-
 startButton : StrModel -> Element.Element Msg
 startButton model =
     let
@@ -138,20 +119,23 @@ startButton model =
             else
                 ifNo
     in
-    column [ Font.color (rgba 255 0 0 1) ]
+    column [ Font.color (rgba 255 0 0 1), centerX ]
         [ button
-            [ Background.color (rgba 0 0 0 0.4)
-            , Font.color (rgba 1 1 1 1)
+            [ centerX
+            , Font.center
+            , width <| Element.px 100
+            , Background.color (rgba 0 0 0 0.4)
+            , Font.color (rgb255 255 255 255)
             , Border.rounded 3
-            , width <| Element.px 50
             ]
             { onPress = Just Start
             , label = text <| ifStarted "Startn't" "Start"
             }
-        , text
+        , el [ centerX ]
+            << text
             << ifStarted ""
           <|
-            inputHelpMessage model.driverStation
+            model.driverStation
         ]
 
 
@@ -176,50 +160,56 @@ strModel model =
 
 view : Model -> Element.Element Msg
 view model =
-    {-
-       if model.isStarted == Pushed then
-           confirmationView <| strModel model
+    if model.isStarted == Pushed then
+        confirmationView <| strModel model
 
-       else
-    -}
-    registryView <| strModel model
+    else
+        registryView <| strModel model
 
 
 registryView : StrModel -> Element.Element Msg
 registryView model =
     column
-        [ Font.color (rgba 1 1 1 1)
-        , Element.padding 4
+        [ centerX
+        , centerY
+        , Font.color (rgb255 0 0 0)
         , spacing 10
         ]
-        [ inputs "Scouter's name:" NameInput model.scouter
-        , inputs "Team's number:" TeamInput model.team
-        , inputs "Match number:" MatchInput model.match
+        [ el [ centerX, Font.underline ] <| text "Registration:"
+        , column
+            [ Border.widthXY 5 5
+            , Background.color (rgb255 150 200 250)
+            , Border.color (rgb255 150 200 250)
+            , Border.rounded 20
+            , padding 4
+            ]
+            [ inputs "Scouter's name:" NameInput model.scouter
+            , inputs "Team's number:" TeamInput model.team
+            , inputs "Match number:" MatchInput model.match
+            ]
         , startButton model
         ]
 
 
-
-{-
-   confirmationView : StrModel -> Element.Element Msg
-   confirmationView model =
-       Html.pre []
-           [ Html.div
-               [ style "text-decoration" "underline" ]
-               [ Html.text "Status:\n" ]
-           , Html.text <|
-               String.concat
-                   [ "\nname - "
-                   , model.scouter
-                   , "\nteam - "
-                   , model.team
-                   , "\nmatch - "
-                   , model.match
-                   , "\nstation - "
-                   , model.driverStation
-                   , "\n\n"
-                   , Matches.asComment
-                   ]
-           , startButton model
-           ]
--}
+confirmationView : StrModel -> Element.Element Msg
+confirmationView model =
+    column
+        [ Font.color (rgba 0 0 0 1)
+        , Element.padding 4
+        , spacing 10
+        ]
+        [ text <|
+            String.concat
+                [ "\nname - "
+                , model.scouter
+                , "\nteam - "
+                , model.team
+                , "\nmatch - "
+                , model.match
+                , "\nstation - "
+                , model.driverStation
+                , "\n\n"
+                , Matches.asComment
+                ]
+        , startButton model
+        ]

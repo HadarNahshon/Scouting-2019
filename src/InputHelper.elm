@@ -1,13 +1,9 @@
 module InputHelper exposing (inputs, unwrapToString)
 
-import Element exposing (rgba, text)
-import Element.Background as Background
+import Element exposing (centerX, rgba, text)
 import Element.Font as Font
 import Element.Input as Input
-import Html
-import Html.Attributes exposing (placeholder, value)
-import Html.Events exposing (onInput)
-import Maybe
+import Html.Attributes exposing (placeholder)
 import Maybe.Extra exposing (unwrap)
 
 
@@ -19,9 +15,12 @@ unwrapToString =
 inputs : String -> (String -> msg) -> String -> Element.Element msg
 inputs description inputType getValue =
     Input.text
-        [ Font.color (rgba 0 0 0 1) ]
+        [ Font.color (rgba 0 0 0 1)
+        , Font.center
+        , centerX
+        ]
         { text = getValue
-        , placeholder = Just (Input.placeholder [] (text description))
+        , placeholder = Just << Input.placeholder [] <| text description
         , onChange = inputType
-        , label = Input.labelAbove [ Font.underline, Font.color (rgba 0 0 0 1) ] (text description)
+        , label = Input.labelAbove [] (text description)
         }

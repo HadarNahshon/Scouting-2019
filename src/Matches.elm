@@ -51,8 +51,7 @@ stationName team match =
     in
     case getMatch match of
         Nothing ->
-            -- Not a match
-            " "
+            "Not a match"
 
         Just matchData ->
             if matchData.blue.one == teamN then
@@ -74,8 +73,7 @@ stationName team match =
                 "אדום 3"
 
             else
-                -- Team not in this match
-                "  "
+                "Team not in this match"
 
 
 asComment : String
