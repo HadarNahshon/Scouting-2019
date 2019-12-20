@@ -9,7 +9,8 @@ import Element.Border as Border
 import Element.Font as Font
 import Element.Input exposing (button)
 import InputHelper exposing (inputs, unwrapToString)
-import Matches exposing (asComment, stationName)
+import Matches exposing (asComment, possibleStations)
+import Maybe exposing (map2)
 
 
 main : Program () Model Msg
@@ -48,7 +49,7 @@ init =
     { scouter = ""
     , team = Nothing
     , match = Nothing
-    , driverStation = "Please enter after typing the info ^^"
+    , driverStation = "Please fill all info ^^"
     , isStarted = Untouched
     }
 
@@ -63,20 +64,21 @@ update msg model =
 
         TeamInput input ->
             { model
+              --map2 possibleStations (getMatch match) team
                 | team = String.toInt input
-                , driverStation = stationName (String.toInt input) model.match
+                , driverStation = map2 possibleStations model.match (String.toInt input)
             }
 
         MatchInput input ->
             { model
                 | match = String.toInt input
-                , driverStation = stationName model.team (String.toInt input)
+                , driverStation = map2 possibleStations (String.toInt input) model.team
             }
 
         Start ->
             { model
                 | isStarted = switchButtonState model
-                , driverStation = stationName model.team model.match
+                , driverStation = map2 possibleStations model.match model.team
             }
 
 
@@ -124,6 +126,7 @@ startButton model =
             [ centerX
             , Font.center
             , width <| Element.px 100
+            , spacing 5
             , Background.color (rgba 0 0 0 0.4)
             , Font.color (rgb255 255 255 255)
             , Border.rounded 3
@@ -131,11 +134,7 @@ startButton model =
             { onPress = Just Start
             , label = text <| ifStarted "Startn't" "Start"
             }
-        , el [ centerX ]
-            << text
-            << ifStarted ""
-          <|
-            model.driverStation
+        , el [ centerX ] << text << ifStarted "" <| model.driverStation
         ]
 
 

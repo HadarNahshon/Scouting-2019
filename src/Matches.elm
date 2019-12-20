@@ -1,8 +1,7 @@
-module Matches exposing (asComment, stationName)
+module Matches exposing (asComment, possibleStations)
 
-import List.Extra exposing (elemIndex, getAt)
-import Maybe exposing (withDefault)
-import String
+import Debug exposing (todo)
+import List.Extra exposing (getAt)
 
 
 type alias Alliance =
@@ -40,40 +39,48 @@ getMatch match =
 
 getTeam : Int -> Int -> String
 getTeam team index =
-    "not yet"
+    Debug.todo "update getTeam"
 
 
-stationName : Maybe Int -> Maybe Int -> String
-stationName team match =
-    let
-        teamN =
-            withDefault 0 team
-    in
-    case getMatch match of
-        Nothing ->
-            "Not a match"
 
-        Just matchData ->
-            if matchData.blue.one == teamN then
-                "כחול 1"
+{-
+   stationName : Maybe Int -> Maybe Int -> Maybe String
+   stationName =
+        let
+              teamN =
+                  withDefault 0 team
+          in
+          case getMatch match of
+              Nothing ->
 
-            else if matchData.blue.two == teamN then
-                "כחול 2"
+                  "Not a match"
 
-            else if matchData.blue.three == teamN then
-                "כחול 3"
+              Just matchData ->
+-}
 
-            else if matchData.red.one == teamN then
-                "אדום 1"
 
-            else if matchData.red.two == teamN then
-                "אדום 2"
+possibleStations : Match -> Int -> String
+possibleStations matchData teamN =
+    if matchData.blue.one == teamN then
+        "כחול 1"
 
-            else if matchData.red.three == teamN then
-                "אדום 3"
+    else if matchData.blue.two == teamN then
+        "כחול 2"
 
-            else
-                "Team not in this match"
+    else if matchData.blue.three == teamN then
+        "כחול 3"
+
+    else if matchData.red.one == teamN then
+        "אדום 1"
+
+    else if matchData.red.two == teamN then
+        "אדום 2"
+
+    else if matchData.red.three == teamN then
+        "אדום 3"
+
+    else
+        "Team not in this match"
 
 
 asComment : String
